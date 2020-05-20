@@ -2,18 +2,18 @@ package io.github.cs102g1j.ar;
 
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
-import com.google.ar.core.Pose;
-import com.google.ar.core.TrackingState;
+import com.google.ar.core.HitResult;
+import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.function.Consumer;
@@ -21,11 +21,10 @@ import java.util.function.Function;
 
 import io.github.cs102g1j.R;
 
-public class ARActivity extends AppCompatActivity
+public class AAA extends AppCompatActivity
 {
-   ArFragment arFragment;
-   ModelRenderable andyRenderable;
-   boolean placed = false;
+   private ArFragment arFragment;
+   private ModelRenderable andyRenderable;
 
    @Override
    @SuppressWarnings( { "AndroidApiChecker", "FutureReturnValueIgnored" } )
@@ -34,8 +33,6 @@ public class ARActivity extends AppCompatActivity
    protected void onCreate( Bundle savedInstanceState )
    {
       super.onCreate( savedInstanceState );
-
-
       setContentView( R.layout.activity_ar );
       arFragment = (ArFragment) getSupportFragmentManager().findFragmentById( R.id.ux_fragment );
 
@@ -58,8 +55,8 @@ public class ARActivity extends AppCompatActivity
                         @Override
                         public Void apply( Throwable throwable )
                         {
-                           Toast toast = Toast.makeText( ARActivity.this,
-                                                         "Unable to load any pokemons",
+                           Toast toast = Toast.makeText( AAA.this,
+                                                         "Unable to load pokemons",
                                                          Toast.LENGTH_LONG
                                                        );
                            toast.setGravity( Gravity.CENTER, 0, 0 );
@@ -68,41 +65,29 @@ public class ARActivity extends AppCompatActivity
                         }
                      } );
 
-
-      arFragment.getArSceneView().getScene().addOnUpdateListener( this::onUpdateFrame );
-
-   }
-
-   private void onUpdateFrame( FrameTime frameTime )
-   {
-      Frame frame = arFragment.getArSceneView().getArFrame();
-
-      // If there is no frame, just return.
-      if ( frame == null )
+      arFragment.setOnTapArPlaneListener( new BaseArFragment.OnTapArPlaneListener()
       {
-         return;
-      }
+         @Override
+         public void onTapPlane( HitResult hitResult, Plane plane, MotionEvent motionEvent
+                               )
+         {
+            if ( andyRenderable == null )
+            {
+               return;
+            }
 
-      //Making sure ARCore is tracking some feature points, makes the augmentation little stable.
-      if ( frame.getCamera().getTrackingState() == TrackingState.TRACKING && !placed )
-      {
+            // Create the Anchor.
+            Anchor anchor = hitResult.createAnchor();
+            AnchorNode anchorNode = new AnchorNode( anchor );
+            anchorNode.setParent( arFragment.getArSceneView().getScene() );
 
-         Pose pos = frame.getCamera().getPose().compose( Pose.makeTranslation( 0, 0, -0.3f ) );
-         Anchor anchor = arFragment.getArSceneView().getSession().createAnchor( pos );
-         AnchorNode anchorNode = new AnchorNode( anchor );
-         anchorNode.setParent( arFragment.getArSceneView().getScene() );
-
-         // Create the arrow node and add it to the anchor.
-         placed = true; //to place the arrow just once.
-         // anchor.
-         TransformableNode andy = new TransformableNode( arFragment.getTransformationSystem() );
-         andy.setParent( anchorNode );
-         andy.setRenderable( andyRenderable );
-         andy.select();
-
-      }
-
+            // Create the transformable andy and add it to the
+            // anchor.
+            TransformableNode andy = new TransformableNode( arFragment.getTransformationSystem() );
+            andy.setParent( anchorNode );
+            andy.setRenderable( andyRenderable );
+            andy.select();
+         }
+      } );
    }
-
 }
-
