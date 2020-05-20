@@ -1,5 +1,6 @@
 package io.github.cs102g1j.ar;
 
+
 import android.os.Bundle;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -7,14 +8,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
 import com.google.ar.core.Pose;
-import com.google.ar.core.TrackingState;
+import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,6 +23,7 @@ public class ARActivity extends AppCompatActivity
 {
    ArFragment arFragment;
    ModelRenderable andyRenderable;
+   AnchorNode anchorNode;
    boolean placed = false;
 
    @Override
@@ -68,11 +67,24 @@ public class ARActivity extends AppCompatActivity
                         }
                      } );
 
+      if ( this.anchorNode == null )
+      {
 
-      arFragment.getArSceneView().getScene().addOnUpdateListener( this::onUpdateFrame );
+         Session session = arFragment.getArSceneView().getSession();
+
+         float[] position = { 0, 0, -0.75f };       // 75 cm away from camera
+         float[] rotation = { 0, 0, 0, 1 };
+
+         Anchor anchor = session.createAnchor( new Pose( position, rotation ) );
+
+         anchorNode = new AnchorNode( anchor );
+         anchorNode.setRenderable( andyRenderable );
+         anchorNode.setParent( arFragment.getArSceneView().getScene() );
+      }
+      //arFragment.getArSceneView().getScene().addOnUpdateListener( this::onUpdateFrame );
 
    }
-
+/*
    private void onUpdateFrame( FrameTime frameTime )
    {
       Frame frame = arFragment.getArSceneView().getArFrame();
@@ -102,7 +114,7 @@ public class ARActivity extends AppCompatActivity
 
       }
 
-   }
+   }*/
 
 }
 
