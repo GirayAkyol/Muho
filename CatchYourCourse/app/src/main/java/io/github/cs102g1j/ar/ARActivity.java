@@ -75,7 +75,11 @@ public class ARActivity extends AppCompatActivity
          float[] position = { 0, 0, -0.75f };       // 75 cm away from camera
          float[] rotation = { 0, 0, 0, 1 };
 
-         Anchor anchor = session.createAnchor( new Pose( position, rotation ) );
+         Anchor anchor = null;
+         if ( session != null )
+         {
+            anchor = session.createAnchor( new Pose( position, rotation ) );
+         }
 
          anchorNode = new AnchorNode( anchor );
          anchorNode.setRenderable( andyRenderable );
