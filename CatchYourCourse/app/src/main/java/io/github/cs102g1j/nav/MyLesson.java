@@ -1,21 +1,14 @@
 package io.github.cs102g1j.nav;
 /**
  * This is MyLesson class.
- * @author Mustafa Yasir Altunhan.
- * @author Mustafa Utku Aydoğdu
- * @author Muhammed Can Küçükaslan
- * @version 19.05.2020
  */
 
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.TimeZone;
-
-import io.github.cs102g1j.nav.Building;
 
 public class MyLesson implements Parcelable
 {
@@ -59,7 +52,7 @@ public class MyLesson implements Parcelable
       return 0;
    }
 
-   public static final Creator< MyLesson > CREATOR = new Creator< MyLesson >()
+   public static final Creator<MyLesson> CREATOR = new Creator<MyLesson>()
    {
       @Override
       public MyLesson createFromParcel( Parcel in )
@@ -75,43 +68,87 @@ public class MyLesson implements Parcelable
    };
 
    //methods
+
+   /**
+    * Returns the name of the lecture.
+    *
+    * @return the name of the lecture.
+    */
    public String getLectureName()
    {
       return lectureName;
    }
 
+   /**
+    * Returns the place of the lecture.
+    *
+    * @return the place of the lecture.
+    */
    public Building getLectureBuilding()
    {
       return lectureBuilding;
    }
 
+   /**
+    * Returns the time of the lecture.
+    *
+    * @return the time of the lecture.
+    */
    public MyDate getLectureTime()
    {
       return lectureTime;
    }
 
-   public boolean getIsTimeToAppearPokemon() { return isTimeToAppearPokemon; }
+   /**
+    * Returns whether it is valid for a pokemon in ARActivity.
+    *
+    * @return true if valid, false otherwise.
+    */
+   public boolean getIsTimeToAppearPokemon()
+   {
+      return isTimeToAppearPokemon;
+   }
 
-   // SHOULD THE SETTERS ALSO RETURN THE  VALUES WE SET
-   public void setLectureName( String name)
+   /**
+    * Sets the name of the lecture.
+    *
+    * @param name name of the lecture.
+    */
+   public void setLectureName( String name )
    {
       lectureName = name;
    }
 
-   public void setLectureBuilding( Building building)
+   /**
+    * Sets the place of the lecture.
+    *
+    * @param building place of the lecture.
+    */
+   public void setLectureBuilding( Building building )
    {
       lectureBuilding = building;
 
    }
 
-   public void setLectureTime( MyDate date)
+   /**
+    * Sets the date of the lecture.
+    *
+    * @param date date of the lecture.
+    */
+   public void setLectureTime( MyDate date )
    {
       lectureTime = date;
    }
 
-
-
-   public boolean isNow( Location currentLocation)
+   /**
+    * Returns whether the current time and location is valid to launch AR. Also updates the
+    * isTimeToAppearPokemon variable.
+    *
+    * @param currentLocation the current location.
+    *
+    * @return true if valid, false otherwise.
+    */
+   public boolean isNow( Location currentLocation )
    {
       // getting the current time
       Calendar calendar = Calendar.getInstance( TimeZone.getDefault() );
@@ -122,33 +159,49 @@ public class MyLesson implements Parcelable
       );
 
 
-      isTimeToAppearPokemon = lectureBuilding.isNearer( DISTANCE_20,
-                                                        currentLocation
-                                                      ) &&
+      isTimeToAppearPokemon = lectureBuilding.isNearer( DISTANCE_20, currentLocation ) &&
                               lectureTime.isIncludes( currentDate );
 
-      return lectureBuilding.isNearer( DISTANCE_20, currentLocation ) &&
-             lectureTime.isIncludes( currentDate );
+      return lectureBuilding.isNearer( DISTANCE_20, currentLocation ) && lectureTime.isIncludes(
+         currentDate );
    }
+
+   /**
+    * Returns the name of the lecture.
+    * @return name of the lecture.
+    */
    public String getLecture()
    {
       return lectureName;
    }
 
+   /**
+    * Returns the place of the lecture.
+    * @return place of the lecture.
+    */
    public String getPlace()
    {
       return lectureBuilding.toString();
    }
 
+   /**
+    * Returns the date of the lecture.
+    * @return date of the lecture.
+    */
    public String getDate()
    {
       return lectureTime.normalize( lectureTime.getStartTime() );
    }
+
    @Override
    public String toString()
    {
-      return lectureName + " at " + lectureBuilding.toString()
-             + "\nbetween " + lectureTime.normalize( lectureTime.getStartTime() )
-             + " and " + lectureTime.normalize( lectureTime.getEndTime() );
+      return lectureName +
+             " at " +
+             lectureBuilding.toString() +
+             "\nbetween " +
+             lectureTime.normalize( lectureTime.getStartTime() ) +
+             " and " +
+             lectureTime.normalize( lectureTime.getEndTime() );
    }
 } // END OF the class
